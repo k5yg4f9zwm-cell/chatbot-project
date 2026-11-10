@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="kk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Үміткерлерге арналған чатбот</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">🎓 Үміткерлерге арналған чатбот көмекшісі</h1>
+            <a href="{{ url_for('admin_login') }}" class="btn btn-outline-secondary btn-sm">Админ панель</a>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        <p class="mb-0">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Сұрақ қойыңыз</h4>
+                <form method="post" action="{{ url_for('search') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group">
+                        <input type="text" name="query" class="form-control" placeholder="Мысалы: Қандай құжаттар қажет?" required>
+                        <button class="btn btn-primary" type="submit">Іздеу</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if results is not none %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">Іздеу нәтижелері</div>
+                <div class="card-body">
+                    {% if results %}
+                        <ul class="list-group list-group-flush">
+                            {% for r in results %}
+                                <li class="list-group-item">
+                                    <strong>Сұрақ:</strong> {{ r.question }}<br>
+                                    <strong>Жауап:</strong> {{ r.answer }} <span class="badge bg-secondary float-end">{{ r.category }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Кешіріңіз, бұл сұрақ бойынша ештеңе табылмады.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header">Жиі қойылатын сұрақтар (FAQ базасы)</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for f in faqs %}
+                        <li class="list-group-item">
+                            <span class="badge bg-info text-dark">{{ f.category }}</span>
+                            <strong>{{ f.question }}</strong>
+                            <p class="text-muted mb-0 mt-1">{{ f.answer }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
